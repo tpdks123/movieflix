@@ -1,0 +1,140 @@
+<html>
+<head>
+<title>main.py</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #cf8e6d;}
+.s1 { color: #bcbec4;}
+.s2 { color: #bcbec4;}
+.s3 { color: #6aab73;}
+.s4 { color: #2aacb8;}
+.s5 { color: #7a7e85;}
+</style>
+</head>
+<body bgcolor="#1e1f22">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+main.py</font>
+</center></td></tr></table>
+<pre><span class="s0">from </span><span class="s1">flask </span><span class="s0">import </span><span class="s1">Flask</span><span class="s2">, </span><span class="s1">render_template</span><span class="s2">, </span><span class="s1">request</span><span class="s2">, </span><span class="s1">redirect</span><span class="s2">, </span><span class="s1">url_for</span><span class="s2">, </span><span class="s1">session</span>
+<span class="s0">from </span><span class="s1">flask_sqlalchemy </span><span class="s0">import </span><span class="s1">SQLAlchemy</span>
+
+
+<span class="s1">app </span><span class="s2">= </span><span class="s1">Flask</span><span class="s2">(</span><span class="s1">__name__</span><span class="s2">)</span>
+
+<span class="s1">movies </span><span class="s2">= [</span>
+    <span class="s2">{</span>
+        <span class="s3">'id'</span><span class="s2">: </span><span class="s4">1</span><span class="s2">,</span>
+        <span class="s3">'title'</span><span class="s2">: </span><span class="s3">'Inception'</span><span class="s2">,</span>
+        <span class="s3">'poster'</span><span class="s2">: </span><span class="s3">'https://example.com/poster1.jpg'</span><span class="s2">,</span>
+        <span class="s3">'description'</span><span class="s2">: </span><span class="s3">'A thief enters the dreams of others to steal their secrets.'</span><span class="s2">,</span>
+        <span class="s3">'genre'</span><span class="s2">: </span><span class="s3">'Sci-Fi'</span><span class="s2">,</span>
+        <span class="s3">'release_date'</span><span class="s2">: </span><span class="s3">'2010-07-16'</span><span class="s2">,</span>
+        <span class="s3">'rating'</span><span class="s2">: </span><span class="s4">8.8</span>
+    <span class="s2">},</span>
+    <span class="s2">{</span>
+        <span class="s3">'id'</span><span class="s2">: </span><span class="s4">2</span><span class="s2">,</span>
+        <span class="s3">'title'</span><span class="s2">: </span><span class="s3">'The Dark Knight'</span><span class="s2">,</span>
+        <span class="s3">'poster'</span><span class="s2">: </span><span class="s3">'https://example.com/poster2.jpg'</span><span class="s2">,</span>
+        <span class="s3">'description'</span><span class="s2">: </span><span class="s3">'Batman faces the Joker, a criminal mastermind with a dark sense of humor.'</span><span class="s2">,</span>
+        <span class="s3">'genre'</span><span class="s2">: </span><span class="s3">'Action'</span><span class="s2">,</span>
+        <span class="s3">'release_date'</span><span class="s2">: </span><span class="s3">'2008-07-18'</span><span class="s2">,</span>
+        <span class="s3">'rating'</span><span class="s2">: </span><span class="s4">9.0</span>
+    <span class="s2">},</span>
+    <span class="s5"># ... (더 많은 영화 추가)</span>
+<span class="s2">]</span>
+
+<span class="s1">users </span><span class="s2">= [</span>
+    <span class="s2">{</span><span class="s3">'username'</span><span class="s2">: </span><span class="s3">'user1'</span><span class="s2">, </span><span class="s3">'password'</span><span class="s2">: </span><span class="s3">'password1'</span><span class="s2">},</span>
+    <span class="s2">{</span><span class="s3">'username'</span><span class="s2">: </span><span class="s3">'user2'</span><span class="s2">, </span><span class="s3">'password'</span><span class="s2">: </span><span class="s3">'password2'</span><span class="s2">},</span>
+<span class="s2">]</span>
+
+<span class="s5"># MySQL 데이터베이스 설정</span>
+<span class="s1">app</span><span class="s2">.</span><span class="s1">config</span><span class="s2">[</span><span class="s3">'SQLALCHEMY_DATABASE_URI'</span><span class="s2">] = </span><span class="s3">'mysql+pymysql://sean:jj001109@localhost/db_movieflix'</span>
+<span class="s1">db </span><span class="s2">= </span><span class="s1">SQLAlchemy</span><span class="s2">(</span><span class="s1">app</span><span class="s2">)</span>
+
+<span class="s0">class </span><span class="s1">User</span><span class="s2">(</span><span class="s1">db</span><span class="s2">.</span><span class="s1">Model</span><span class="s2">):</span>
+    <span class="s1">id </span><span class="s2">= </span><span class="s1">db</span><span class="s2">.</span><span class="s1">Column</span><span class="s2">(</span><span class="s1">db</span><span class="s2">.</span><span class="s1">Integer</span><span class="s2">, </span><span class="s1">primary_key</span><span class="s2">=</span><span class="s0">True</span><span class="s2">)</span>
+    <span class="s1">username </span><span class="s2">= </span><span class="s1">db</span><span class="s2">.</span><span class="s1">Column</span><span class="s2">(</span><span class="s1">db</span><span class="s2">.</span><span class="s1">String</span><span class="s2">(</span><span class="s4">20</span><span class="s2">), </span><span class="s1">unique</span><span class="s2">=</span><span class="s0">True</span><span class="s2">, </span><span class="s1">nullable</span><span class="s2">=</span><span class="s0">False</span><span class="s2">)</span>
+    <span class="s1">password </span><span class="s2">= </span><span class="s1">db</span><span class="s2">.</span><span class="s1">Column</span><span class="s2">(</span><span class="s1">db</span><span class="s2">.</span><span class="s1">String</span><span class="s2">(</span><span class="s4">60</span><span class="s2">), </span><span class="s1">nullable</span><span class="s2">=</span><span class="s0">False</span><span class="s2">)</span>
+    <span class="s1">email </span><span class="s2">= </span><span class="s1">db</span><span class="s2">.</span><span class="s1">Column</span><span class="s2">(</span><span class="s1">db</span><span class="s2">.</span><span class="s1">String</span><span class="s2">(</span><span class="s4">120</span><span class="s2">), </span><span class="s1">unique</span><span class="s2">=</span><span class="s0">True</span><span class="s2">, </span><span class="s1">nullable</span><span class="s2">=</span><span class="s0">False</span><span class="s2">)</span>
+
+<span class="s5"># 데이터베이스 테이블 생성</span>
+<span class="s0">with </span><span class="s1">app</span><span class="s2">.</span><span class="s1">app_context</span><span class="s2">():</span>
+    <span class="s1">db</span><span class="s2">.</span><span class="s1">create_all</span><span class="s2">()</span>
+
+<span class="s2">@</span><span class="s1">app</span><span class="s2">.</span><span class="s1">route</span><span class="s2">(</span><span class="s3">'/home'</span><span class="s2">)</span>
+<span class="s0">def </span><span class="s1">home</span><span class="s2">():</span>
+    <span class="s0">return </span><span class="s1">render_template</span><span class="s2">(</span><span class="s3">'main.html'</span><span class="s2">)</span>
+
+
+<span class="s2">@</span><span class="s1">app</span><span class="s2">.</span><span class="s1">route</span><span class="s2">(</span><span class="s3">'/login'</span><span class="s2">, </span><span class="s1">methods</span><span class="s2">=[</span><span class="s3">&quot;GET&quot;</span><span class="s2">, </span><span class="s3">&quot;POST&quot;</span><span class="s2">])</span>
+<span class="s0">def </span><span class="s1">login</span><span class="s2">():</span>
+    <span class="s0">if </span><span class="s1">request</span><span class="s2">.</span><span class="s1">method </span><span class="s2">== </span><span class="s3">'POST'</span><span class="s2">:</span>
+        <span class="s1">username </span><span class="s2">= </span><span class="s1">request</span><span class="s2">.</span><span class="s1">form</span><span class="s2">[</span><span class="s3">'username'</span><span class="s2">]</span>
+        <span class="s1">password </span><span class="s2">= </span><span class="s1">request</span><span class="s2">.</span><span class="s1">form</span><span class="s2">[</span><span class="s3">'password'</span><span class="s2">]</span>
+
+        <span class="s1">user </span><span class="s2">= </span><span class="s1">User</span><span class="s2">.</span><span class="s1">query</span><span class="s2">.</span><span class="s1">filter_by</span><span class="s2">(</span><span class="s1">username</span><span class="s2">=</span><span class="s1">username</span><span class="s2">, </span><span class="s1">password</span><span class="s2">=</span><span class="s1">password</span><span class="s2">).</span><span class="s1">first</span><span class="s2">()</span>
+
+        <span class="s0">if </span><span class="s1">user</span><span class="s2">:</span>
+            <span class="s5"># 로그인 성공 시 세션에 사용자 정보 저장</span>
+            <span class="s1">session</span><span class="s2">[</span><span class="s3">'user'</span><span class="s2">] = {</span><span class="s3">'id'</span><span class="s2">: </span><span class="s1">user</span><span class="s2">.</span><span class="s1">id</span><span class="s2">, </span><span class="s3">'username'</span><span class="s2">: </span><span class="s1">user</span><span class="s2">.</span><span class="s1">username</span><span class="s2">}</span>
+            <span class="s0">return </span><span class="s1">render_template</span><span class="s2">(</span><span class="s3">'main.html'</span><span class="s2">)</span>
+        <span class="s0">else</span><span class="s2">:</span>
+            <span class="s5"># 로그인 실패 시 에러 메시지 반환</span>
+            <span class="s1">error </span><span class="s2">= </span><span class="s3">'Invalid username or password'</span>
+            <span class="s0">return </span><span class="s1">render_template</span><span class="s2">(</span><span class="s3">'login.html'</span><span class="s2">, </span><span class="s1">error</span><span class="s2">=</span><span class="s1">error</span><span class="s2">)</span>
+
+    <span class="s0">return </span><span class="s1">render_template</span><span class="s2">(</span><span class="s3">'login.html'</span><span class="s2">)</span>
+
+<span class="s2">@</span><span class="s1">app</span><span class="s2">.</span><span class="s1">route</span><span class="s2">(</span><span class="s3">'/logout'</span><span class="s2">)</span>
+<span class="s0">def </span><span class="s1">logout</span><span class="s2">():</span>
+    <span class="s0">pass</span>
+
+<span class="s2">@</span><span class="s1">app</span><span class="s2">.</span><span class="s1">route</span><span class="s2">(</span><span class="s3">'/'</span><span class="s2">)</span>
+<span class="s0">def </span><span class="s1">start</span><span class="s2">():</span>
+    <span class="s0">return </span><span class="s1">render_template</span><span class="s2">(</span><span class="s3">'start.html'</span><span class="s2">)</span>
+
+<span class="s2">@</span><span class="s1">app</span><span class="s2">.</span><span class="s1">route</span><span class="s2">(</span><span class="s3">'/signup'</span><span class="s2">, </span><span class="s1">methods</span><span class="s2">=[</span><span class="s3">'GET'</span><span class="s2">, </span><span class="s3">'POST'</span><span class="s2">])</span>
+<span class="s0">def </span><span class="s1">signup</span><span class="s2">():</span>
+    <span class="s0">if </span><span class="s1">request</span><span class="s2">.</span><span class="s1">method </span><span class="s2">== </span><span class="s3">'POST'</span><span class="s2">:</span>
+        <span class="s1">username </span><span class="s2">= </span><span class="s1">request</span><span class="s2">.</span><span class="s1">form</span><span class="s2">[</span><span class="s3">'username'</span><span class="s2">]</span>
+        <span class="s1">password </span><span class="s2">= </span><span class="s1">request</span><span class="s2">.</span><span class="s1">form</span><span class="s2">[</span><span class="s3">'password'</span><span class="s2">]</span>
+        <span class="s1">email </span><span class="s2">= </span><span class="s1">request</span><span class="s2">.</span><span class="s1">form</span><span class="s2">[</span><span class="s3">'email'</span><span class="s2">]</span>
+        <span class="s1">confirm_password </span><span class="s2">= </span><span class="s1">request</span><span class="s2">.</span><span class="s1">form</span><span class="s2">[</span><span class="s3">'confirm_password'</span><span class="s2">]</span>
+
+        <span class="s5"># 간단한 유효성 검사</span>
+        <span class="s0">if not </span><span class="s1">username </span><span class="s0">or not </span><span class="s1">password </span><span class="s0">or not </span><span class="s1">confirm_password</span><span class="s2">:</span>
+            <span class="s0">return </span><span class="s1">render_template</span><span class="s2">(</span><span class="s3">'signup.html'</span><span class="s2">, </span><span class="s1">error</span><span class="s2">=</span><span class="s3">'모든 필드를 입력해주세요.'</span><span class="s2">)</span>
+
+        <span class="s0">if </span><span class="s1">password </span><span class="s2">!= </span><span class="s1">confirm_password</span><span class="s2">:</span>
+            <span class="s0">return </span><span class="s1">render_template</span><span class="s2">(</span><span class="s3">'signup.html'</span><span class="s2">, </span><span class="s1">error</span><span class="s2">=</span><span class="s3">'비밀번호가 일치하지 않습니다.'</span><span class="s2">)</span>
+
+        <span class="s5"># 사용자 데이터베이스에 추가</span>
+        <span class="s1">new_user </span><span class="s2">= </span><span class="s1">User</span><span class="s2">(</span><span class="s1">username</span><span class="s2">=</span><span class="s1">username</span><span class="s2">, </span><span class="s1">email</span><span class="s2">=</span><span class="s1">email</span><span class="s2">, </span><span class="s1">password</span><span class="s2">=</span><span class="s1">password</span><span class="s2">)</span>
+        <span class="s1">db</span><span class="s2">.</span><span class="s1">session</span><span class="s2">.</span><span class="s1">add</span><span class="s2">(</span><span class="s1">new_user</span><span class="s2">)</span>
+        <span class="s1">db</span><span class="s2">.</span><span class="s1">session</span><span class="s2">.</span><span class="s1">commit</span><span class="s2">()</span>
+
+        <span class="s5"># 회원가입 후 로그인 페이지로 리다이렉션</span>
+        <span class="s0">return </span><span class="s1">redirect</span><span class="s2">(</span><span class="s1">url_for</span><span class="s2">(</span><span class="s3">'login'</span><span class="s2">))</span>
+
+    <span class="s0">return </span><span class="s1">render_template</span><span class="s2">(</span><span class="s3">'signup.html'</span><span class="s2">)</span>
+
+<span class="s2">@</span><span class="s1">app</span><span class="s2">.</span><span class="s1">route</span><span class="s2">(</span><span class="s3">'/movieDetails/&lt;int:data_movie_id&gt;'</span><span class="s2">)</span>
+<span class="s0">def </span><span class="s1">movieDetails</span><span class="s2">(</span><span class="s1">data_movie_id</span><span class="s2">):</span>
+    <span class="s5"># 해당 ID의 영화를 찾음</span>
+    <span class="s0">return </span><span class="s1">render_template</span><span class="s2">(</span><span class="s3">'movieDetails.html'</span><span class="s2">, </span><span class="s1">movie_id</span><span class="s2">=</span><span class="s1">data_movie_id</span><span class="s2">)</span>
+    <span class="s5"># movie = next((m for m in movies if m['id'] == movie_id), None)</span>
+
+    <span class="s5"># if movie:</span>
+    <span class="s5">#     return render_template('MovieDetails.html', movie=movie)</span>
+    <span class="s5"># else:</span>
+    <span class="s5">#     # 찾지 못한 경우 404 에러 페이지로 리다이렉션</span>
+    <span class="s5">#     return redirect(url_for('not_found'))</span>
+
+<span class="s0">if </span><span class="s1">__name__ </span><span class="s2">== </span><span class="s3">'__main__'</span><span class="s2">:</span>
+    <span class="s1">app</span><span class="s2">.</span><span class="s1">run</span><span class="s2">(</span><span class="s1">debug</span><span class="s2">=</span><span class="s0">True</span><span class="s2">)</span>
+</pre>
+</body>
+</html>
